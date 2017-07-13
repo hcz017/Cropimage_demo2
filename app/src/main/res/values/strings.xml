@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Cropimage</string>
+    <string name="app_name">CropImage</string>
+    <string name="cut">cut</string>
+    <string name="img2">image2</string>
+    <string name="img1">image1</string>
+    <string name="show_img">Click below buttons to load image</string>
 </resources>
