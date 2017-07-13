@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hcz017.cropimage.MainActivity">
+
+    <com.hcz017.cropimage.CropImageView
+        android:id="@+id/cropimage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"  />
+
+</RelativeLayout>
