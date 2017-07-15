@@ -99,6 +99,8 @@ public class CropImageView extends View {
         if (mBitmap != null) {
             if (mBitmap.getHeight() > heightSize) {
                 widthSize = heightSize * mBitmap.getWidth() / mBitmap.getHeight();
+            } else if ((mBitmap.getWidth() > widthSize) && (mBitmap.getWidth() > mBitmap.getHeight())) {
+                heightSize = widthSize * mBitmap.getHeight() / mBitmap.getWidth();
             } else {
                 heightSize = mBitmap.getHeight();
                 widthSize = mBitmap.getWidth();
@@ -132,7 +134,6 @@ public class CropImageView extends View {
                 mX_1 = event.getX();
                 mY_1 = event.getY();
                 currentEdge = getTouch((int) mX_1, (int) mY_1);
-                isTouchInSquare = mDrawableFloat.contains((int) event.getX(), (int) event.getY());
                 break;
 
             case MotionEvent.ACTION_UP:
@@ -151,8 +152,8 @@ public class CropImageView extends View {
 
                     mX_1 = event.getX();
                     mY_1 = event.getY();
-                    // 如果手指坐标超出view返回，则返回。
-                    // 理论上应该写在这里，但会产生一个移动四个角的时候不容易移到到边界的现象
+                    // TODO 如果手指坐标超出view范围，则返回。
+                    // 理论上应该写在这里，但会产生一个移动四个角过快的时候不容易移到到边界的现象
 //                    if (mX_1 > getWidth() || mX_1 < 0 || mY_1 > getHeight() || mY_1 < 0) {
 //                        break;
 //                    }
@@ -188,11 +189,10 @@ public class CropImageView extends View {
                                 break;
 
                             case EDGE_MOVE_IN:
+                                // 因为手指一直在移动，应该实时判断是否超出裁剪框（手指移动到图片范围外）
+                                isTouchInSquare = mDrawableFloat.contains((int) event.getX(),
+                                        (int) event.getY());
                                 if (isTouchInSquare) {
-                                    // 如果手指坐标超出view，则返回
-                                    if (mX_1 > getWidth() || mX_1 < 0 || mY_1 > getHeight() || mY_1 < 0) {
-                                        break;
-                                    }
                                     mDrawableFloat.offset(dx, dy);
                                 }
                                 break;
@@ -252,7 +252,7 @@ public class CropImageView extends View {
         }
 
         configureBounds();
-        // 在画布上花图片
+        // 在画布上画图片
         mDrawable.draw(canvas);
         canvas.save();
         // 在画布上画浮层FloatDrawable,Region.Op.DIFFERENCE是表示Rect交集的补集
@@ -308,44 +308,41 @@ public class CropImageView extends View {
 
             isFirst = false;
         } else if (getTouch((int) mX_1, (int) mY_1) == EDGE_MOVE_IN) {
-            int floatLeft = mDrawableFloat.left;
-            int floatTop = mDrawableFloat.top;
-            if (floatLeft < 0) {
+            if (mDrawableFloat.left < 0) {
                 mDrawableFloat.right = mDrawableFloat.width();
-                floatLeft = 0;
+                mDrawableFloat.left = 0;
             }
-            if (floatTop < 0) {
+            if (mDrawableFloat.top < 0) {
                 mDrawableFloat.bottom = mDrawableFloat.height();
-                floatTop = 0;
+                mDrawableFloat.top = 0;
             }
             if (mDrawableFloat.right > getWidth()) {
-                floatLeft = getWidth() - mDrawableFloat.width();
+                mDrawableFloat.left = getWidth() - mDrawableFloat.width();
                 mDrawableFloat.right = getWidth();
             }
             if (mDrawableFloat.bottom > getHeight()) {
-                floatTop = getHeight() - mDrawableFloat.height();
+                mDrawableFloat.top = getHeight() - mDrawableFloat.height();
                 mDrawableFloat.bottom = getHeight();
             }
-            mDrawableFloat.set(floatLeft, floatTop, mDrawableFloat.right, mDrawableFloat.bottom);
+            mDrawableFloat.set(mDrawableFloat.left, mDrawableFloat.top, mDrawableFloat.right,
+                    mDrawableFloat.bottom);
         } else {
-
-            int floatLeft = mDrawableFloat.left;
-            int floatTop = mDrawableFloat.top;
-            if (floatLeft < 0) {
-                floatLeft = 0;
+            if (mDrawableFloat.left < 0) {
+                mDrawableFloat.left = 0;
             }
-            if (floatTop < 0) {
-                floatTop = 0;
+            if (mDrawableFloat.top < 0) {
+                mDrawableFloat.top = 0;
             }
             if (mDrawableFloat.right > getWidth()) {
                 mDrawableFloat.right = getWidth();
-                floatLeft = getWidth() - mDrawableFloat.width();
+                mDrawableFloat.left = getWidth() - mDrawableFloat.width();
             }
             if (mDrawableFloat.bottom > getHeight()) {
                 mDrawableFloat.bottom = getHeight();
-                floatTop = getHeight() - mDrawableFloat.height();
+                mDrawableFloat.top = getHeight() - mDrawableFloat.height();
             }
-            mDrawableFloat.set(floatLeft, floatTop, mDrawableFloat.right, mDrawableFloat.bottom);
+            mDrawableFloat.set(mDrawableFloat.left, mDrawableFloat.top, mDrawableFloat.right,
+                    mDrawableFloat.bottom);
         }
 
         mDrawable.setBounds(mDrawableDst);
@@ -362,12 +359,7 @@ public class CropImageView extends View {
         float scale = (float) (mDrawableSrc.width())
                 / (float) (mDrawableDst.width());
         matrix.postScale(scale, scale);
-        if (mDrawableFloat.left < 0) {
-            mDrawableFloat.left = 0;
-        }
-        if (mDrawableFloat.top < 0) {
-            mDrawableFloat.top = 0;
-        }
+
         Bitmap ret = Bitmap.createBitmap(tmpBitmap, mDrawableFloat.left,
                 mDrawableFloat.top, mDrawableFloat.width(),
                 mDrawableFloat.height(), matrix, true);
