@@ -97,7 +97,7 @@ public class CropImageView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         if (mBitmap != null) {
-            if (mBitmap.getHeight() > heightSize) {
+            if ((mBitmap.getHeight() > heightSize) && (mBitmap.getHeight() > mBitmap.getWidth())) {
                 widthSize = heightSize * mBitmap.getWidth() / mBitmap.getHeight();
             } else if ((mBitmap.getWidth() > widthSize) && (mBitmap.getWidth() > mBitmap.getHeight())) {
                 heightSize = widthSize * mBitmap.getHeight() / mBitmap.getWidth();
