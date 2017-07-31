@@ -1,6 +1,6 @@
 # CropImageView
 
-CropImageView的原型来自[**Cropimage_demo**](https://github.com/gumingwei/Cropimage_demo)，是android上的的一个图片裁剪控件。
+CropImageView的原型来自[**Cropimage_demo**](https://github.com/gumingwei/Cropimage_demo)，是android上的一个图片裁剪控件。
 
 原作者的博客[Android 自定义控件——图片剪裁](http://blog.csdn.net/u013045971/article/details/41960433)，如果读者想要有更详细的了解，请转至原作者博客。
 
@@ -11,7 +11,7 @@ CropImageView的原型来自[**Cropimage_demo**](https://github.com/gumingwei/Cr
 ## 效果展示
 gif效果展示：
 
-![](Cropimage.gif)
+![](cropimage.gif)
 
 
 ## 特点
